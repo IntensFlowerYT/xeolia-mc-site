@@ -1,31 +1,29 @@
-import fs from 'fs';
-import path from 'path';
+async function confirmVote() {
+    const name = document.getElementById("voteName").value.trim();
+    const message = document.getElementById("voteMessage");
 
-const votesFile = path.join(process.cwd(), 'votes.json');
-
-export default async function handler(req, res) {
-  // Lire ou créer le fichier votes.json
-  if (!fs.existsSync(votesFile)) fs.writeFileSync(votesFile, JSON.stringify([]));
-
-  let votes = JSON.parse(fs.readFileSync(votesFile, 'utf8'));
-
-  if (req.method === 'GET') {
-    // Récupérer tous les votes
-    res.status(200).json({ votes });
-  } 
-  else if (req.method === 'POST') {
-    const { pseudo } = req.body;
-
-    if (!pseudo || pseudo.trim() === "") {
-      return res.status(400).json({ error: "Pseudo manquant" });
+    if(!name) {
+        message.textContent = "Veuillez entrer votre pseudo Minecraft !";
+        return;
     }
 
-    votes.push(pseudo.trim());
-    fs.writeFileSync(votesFile, JSON.stringify(votes, null, 2));
+    try {
+        const res = await fetch('/api/votes', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pseudo: name })
+        });
 
-    res.status(200).json({ message: "Vote enregistré !" });
-  } 
-  else {
-    res.status(405).json({ error: "Méthode non autorisée" });
-  }
+        const data = await res.json();
+
+        if(res.ok) {
+            message.textContent = "Le vote a été envoyé ! Vous pouvez revoter dans 1 jour !";
+            document.getElementById("voteName").value = "";
+        } else {
+            message.textContent = data.error || "Erreur lors de l'envoi du vote.";
+        }
+    } catch (err) {
+        console.error(err);
+        message.textContent = "Erreur lors de l'envoi du vote.";
+    }
 }
