@@ -6,6 +6,7 @@
 <title>Xeolia Minecraft Server</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <style>
+/* ====== Styles globaux ====== */
 body {
     margin: 0;
     font-family: 'Orbitron', sans-serif;
@@ -15,44 +16,109 @@ body {
     background-size: cover;
 }
 
-header { padding: 60px 20px; }
-
-.logo { width: 220px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
-@keyframes float { 0%{transform:translateY(0);}50%{transform:translateY(-15px);}100%{transform:translateY(0);} }
-
-h1 { font-size:45px; color:#00ff88; text-shadow:0 0 15px #00ff88; }
-
-.description { max-width:800px; margin:auto; font-size:18px; line-height:1.6; text-shadow:0 0 10px black; }
-
-.buttons { margin-top:40px; }
-
-button {
-    padding:15px 35px;
-    margin:15px;
-    font-size:18px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    transition:0.3s;
-    font-weight:bold;
-    color:white;
+header {
+    padding: 60px 20px;
 }
 
-.btn-grades { background:#ffaa00; }
-.btn-discord { background:#5865F2; }
-.btn-vote { background:#00ccff; }
-.btn-admin { background:#ff4444; }
+/* Logo fixe */
+.logo {
+    width: 220px;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
 
-button:hover { transform:scale(1.1); box-shadow:0 0 20px white; }
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-15px); }
+    100% { transform: translateY(0px); }
+}
 
-.page { display:none; padding:60px 20px; background:rgba(0,0,0,0.5); border-radius:20px; margin:40px auto; max-width:900px; }
-.active { display:block; }
+h1 {
+    font-size: 45px;
+    color: #00ff88;
+    text-shadow: 0 0 15px #00ff88;
+}
 
-.back { margin-top:30px; background:#444; }
+.description {
+    max-width: 800px;
+    margin: auto;
+    font-size: 18px;
+    line-height: 1.6;
+    text-shadow: 0 0 10px black;
+}
 
-footer { margin-top:50px; padding:20px; background:rgba(0,0,0,0.7); font-size:14px; color:#ccc; text-align:center; }
+.buttons {
+    margin-top: 40px;
+}
 
-input[type=text] { padding:10px; font-size:16px; width:70%; margin-top:20px; border-radius:10px; border:none; }
+button {
+    padding: 15px 35px;
+    margin: 15px;
+    font-size: 18px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-weight: bold;
+    color: white;
+}
+
+.btn-grades { background: #ffaa00; }
+.btn-discord { background: #5865F2; }
+.btn-vote { background: #00ccff; }
+.btn-admin { background: #ff4444; }
+
+button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px white;
+}
+
+.page {
+    display: none;
+    padding: 60px 20px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 20px;
+    margin: 40px auto;
+    max-width: 900px;
+}
+
+.active { display: block; }
+
+.back {
+    margin-top: 30px;
+    background: #444;
+}
+
+footer {
+    margin-top: 50px;
+    padding: 20px;
+    background: rgba(0,0,0,0.7);
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+}
+
+input[type=text] {
+    padding:10px;
+    font-size:16px;
+    width:70%;
+    margin-top:20px;
+    border-radius:10px;
+    border:none;
+}
+
+#voteMessage {
+    margin-top: 20px;
+    font-weight:bold;
+}
+
+#voteList {
+    list-style:none;
+    padding:0;
+    text-align:left;
+    max-width:500px;
+    margin:auto;
+}
 </style>
 </head>
 <body>
@@ -97,19 +163,16 @@ input[type=text] { padding:10px; font-size:16px; width:70%; margin-top:20px; bor
 <!-- PAGE VOTE -->
 <div id="vote" class="page">
 <h1>🗳️ Vote</h1>
-<p style="font-size:20px;">Votez pour avoir des crates exclusifs !</p>
-<input type="text" id="voteName" placeholder="Entrez votre pseudo Minecraft">
-<br>
-<button onclick="confirmVote()">Confirmer</button>
-<p id="voteMessage" style="margin-top:20px; font-weight:bold;"></p>
+<input type="text" id="voteName" placeholder="Votre pseudo Minecraft">
+<div id="voteMessage"></div>
+<button class="back" onclick="confirmVote()">Confirmer</button>
 <button class="back" onclick="showPage('home')">Retour</button>
 </div>
 
 <!-- PAGE ADMIN -->
 <div id="admin" class="page">
-<h1>🛠️ Admin Panel</h1>
-<p style="font-size:18px;">Demandes de votes :</p>
-<ul id="voteList" style="text-align:left; margin-top:20px;"></ul>
+<h1>👑 AdminPanel</h1>
+<ul id="voteList"></ul>
 <button class="back" onclick="showPage('home')">Retour</button>
 </div>
 
@@ -118,45 +181,52 @@ input[type=text] { padding:10px; font-size:16px; width:70%; margin-top:20px; bor
 </footer>
 
 <script>
-function showPage(pageId) {
+function showPage(pageId){
     document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(pageId).classList.add("active");
 }
 
-function goDiscord() { window.location.href = "https://discord.gg/k5RmHWWGSz"; }
+function goDiscord(){ window.location.href = "https://discord.gg/k5RmHWWGSz"; }
 
-async function confirmVote() {
+// AdminPanel
+function showAdminPrompt(){
+    const code = prompt("Entrez le code Admin :");
+    if(code === "XEOLIALESGOATS67"){
+        showPage("admin");
+        updateVoteList();
+    } else alert("Code incorrect !");
+}
+
+// Vote
+async function confirmVote(){
     const name = document.getElementById("voteName").value.trim();
     const message = document.getElementById("voteMessage");
     if(!name){ message.textContent="Veuillez entrer votre pseudo Minecraft !"; return; }
 
-    try {
+    try{
         const res = await fetch('/api/votes', {
             method:'POST',
-            headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({ pseudo:name })
+            headers:{ 'Content-Type':'application/json' },
+            body: JSON.stringify({ pseudo: name })
         });
         const data = await res.json();
-        if(res.ok){ message.textContent="Le vote a été envoyé ! Vous pouvez revoter dans 1 jour !"; document.getElementById("voteName").value=""; }
-        else message.textContent = data.error;
-    } catch(e) { message.textContent="Erreur lors de l'envoi du vote."; }
+        message.textContent = res.ok ? "Le vote a été envoyé ! Vous pouvez revoter dans 1 jour !" : data.error;
+        if(res.ok) document.getElementById("voteName").value="";
+    } catch(e){
+        message.textContent="Erreur lors de l'envoi du vote.";
+    }
 }
 
-async function updateVoteList() {
+// AdminPanel récupère les votes
+async function updateVoteList(){
     const list = document.getElementById("voteList");
     list.innerHTML="";
-    try {
+    try{
         const res = await fetch('/api/votes');
         const data = await res.json();
-        if(data.votes.length === 0){ list.innerHTML="<li>Aucun vote pour le moment.</li>"; }
+        if(data.votes.length===0){ list.innerHTML="<li>Aucun vote pour le moment.</li>"; }
         else{ data.votes.forEach(v=>{ const li=document.createElement("li"); li.textContent=v; list.appendChild(li); }); }
-    } catch(e) { list.innerHTML="<li>Impossible de récupérer les votes.</li>"; }
-}
-
-function showAdminPrompt() {
-    const code = prompt("Entrez le code Admin :");
-    if(code === "XEOLIALESGOATS67"){ showPage("admin"); updateVoteList(); }
-    else alert("Code incorrect !");
+    } catch(e){ list.innerHTML="<li>Impossible de récupérer les votes.</li>"; }
 }
 </script>
 
