@@ -6,7 +6,6 @@
 <title>Xeolia Minecraft Server</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 <style>
-/* ====== Styles globaux ====== */
 body {
     margin: 0;
     font-family: 'Orbitron', sans-serif;
@@ -16,105 +15,51 @@ body {
     background-size: cover;
 }
 
-header {
-    padding: 60px 20px;
-}
+header { padding: 60px 20px; }
 
-/* Logo fixe */
-.logo {
-    width: 220px;
-    margin-bottom: 20px;
-    animation: float 3s ease-in-out infinite;
-}
+.logo { width: 220px; margin-bottom: 20px; animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%{transform:translateY(0);}50%{transform:translateY(-15px);}100%{transform:translateY(0);} }
 
-@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-15px); }
-    100% { transform: translateY(0px); }
-}
+h1 { font-size:45px; color:#00ff88; text-shadow:0 0 15px #00ff88; }
 
-h1 {
-    font-size: 45px;
-    color: #00ff88;
-    text-shadow: 0 0 15px #00ff88;
-}
+.description { max-width:800px; margin:auto; font-size:18px; line-height:1.6; text-shadow:0 0 10px black; }
 
-.description {
-    max-width: 800px;
-    margin: auto;
-    font-size: 18px;
-    line-height: 1.6;
-    text-shadow: 0 0 10px black;
-}
-
-.buttons {
-    margin-top: 40px;
-}
+.buttons { margin-top:40px; }
 
 button {
-    padding: 15px 35px;
-    margin: 15px;
-    font-size: 18px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: 0.3s;
-    font-weight: bold;
-    color: white;
+    padding:15px 35px;
+    margin:15px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+    font-weight:bold;
+    color:white;
 }
 
-.btn-grades {
-    background: #ffaa00;
-}
+.btn-grades { background:#ffaa00; }
+.btn-discord { background:#5865F2; }
+.btn-vote { background:#00ccff; }
+.btn-admin { background:#ff4444; }
 
-.btn-discord {
-    background: #5865F2;
-}
+button:hover { transform:scale(1.1); box-shadow:0 0 20px white; }
 
-.btn-vote {
-    background: #00ccff;
-}
+.page { display:none; padding:60px 20px; background:rgba(0,0,0,0.5); border-radius:20px; margin:40px auto; max-width:900px; }
+.active { display:block; }
 
-button:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 20px white;
-}
+.back { margin-top:30px; background:#444; }
 
-.page {
-    display: none;
-    padding: 60px 20px;
-    background: rgba(0,0,0,0.5);
-    border-radius: 20px;
-    margin: 40px auto;
-    max-width: 900px;
-}
+footer { margin-top:50px; padding:20px; background:rgba(0,0,0,0.7); font-size:14px; color:#ccc; text-align:center; }
 
-.active {
-    display: block;
-}
-
-.back {
-    margin-top: 30px;
-    background: #444;
-}
-
-footer {
-    margin-top: 50px;
-    padding: 20px;
-    background: rgba(0,0,0,0.7);
-    font-size: 14px;
-    color: #ccc;
-    text-align: center;
-}
+input[type=text] { padding:10px; font-size:16px; width:70%; margin-top:20px; border-radius:10px; border:none; }
 </style>
 </head>
 <body>
 
 <!-- PAGE ACCUEIL -->
 <div id="home" class="page active">
-
 <header>
-<!-- Logo fixe Axolotl -->
 <img src="https://minecraft.wiki/images/MCD_Leucistic_Axolotl.png?95405" class="logo" alt="Logo Xeolia Axolotl">
 <h1>Xeolia Minecraft Server</h1>
 </header>
@@ -137,8 +82,8 @@ footer {
 <button class="btn-grades" onclick="showPage('grades')">Grades</button>
 <button class="btn-discord" onclick="goDiscord()">Discord</button>
 <button class="btn-vote" onclick="showPage('vote')">Vote</button>
+<button class="btn-admin" onclick="showAdminPrompt()">AdminPanel</button>
 </div>
-
 </div>
 
 <!-- PAGE GRADES -->
@@ -152,8 +97,19 @@ footer {
 <!-- PAGE VOTE -->
 <div id="vote" class="page">
 <h1>🗳️ Vote</h1>
-<p style="font-size:20px;">Votez pour avoir des crates exclusifs !<br><br>
-🔥 Bientôt Rajouté dans le jeu ! 🔥</p>
+<p style="font-size:20px;">Votez pour avoir des crates exclusifs !</p>
+<input type="text" id="voteName" placeholder="Entrez votre pseudo Minecraft">
+<br>
+<button onclick="confirmVote()">Confirmer</button>
+<p id="voteMessage" style="margin-top:20px; font-weight:bold;"></p>
+<button class="back" onclick="showPage('home')">Retour</button>
+</div>
+
+<!-- PAGE ADMIN -->
+<div id="admin" class="page">
+<h1>🛠️ Admin Panel</h1>
+<p style="font-size:18px;">Demandes de votes :</p>
+<ul id="voteList" style="text-align:left; margin-top:20px;"></ul>
 <button class="back" onclick="showPage('home')">Retour</button>
 </div>
 
@@ -163,14 +119,44 @@ footer {
 
 <script>
 function showPage(pageId) {
-    document.querySelectorAll(".page").forEach(page => {
-        page.classList.remove("active");
-    });
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
     document.getElementById(pageId).classList.add("active");
 }
 
-function goDiscord() {
-    window.location.href = "https://discord.gg/k5RmHWWGSz";
+function goDiscord() { window.location.href = "https://discord.gg/k5RmHWWGSz"; }
+
+async function confirmVote() {
+    const name = document.getElementById("voteName").value.trim();
+    const message = document.getElementById("voteMessage");
+    if(!name){ message.textContent="Veuillez entrer votre pseudo Minecraft !"; return; }
+
+    try {
+        const res = await fetch('/api/votes', {
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ pseudo:name })
+        });
+        const data = await res.json();
+        if(res.ok){ message.textContent="Le vote a été envoyé ! Vous pouvez revoter dans 1 jour !"; document.getElementById("voteName").value=""; }
+        else message.textContent = data.error;
+    } catch(e) { message.textContent="Erreur lors de l'envoi du vote."; }
+}
+
+async function updateVoteList() {
+    const list = document.getElementById("voteList");
+    list.innerHTML="";
+    try {
+        const res = await fetch('/api/votes');
+        const data = await res.json();
+        if(data.votes.length === 0){ list.innerHTML="<li>Aucun vote pour le moment.</li>"; }
+        else{ data.votes.forEach(v=>{ const li=document.createElement("li"); li.textContent=v; list.appendChild(li); }); }
+    } catch(e) { list.innerHTML="<li>Impossible de récupérer les votes.</li>"; }
+}
+
+function showAdminPrompt() {
+    const code = prompt("Entrez le code Admin :");
+    if(code === "XEOLIALESGOATS67"){ showPage("admin"); updateVoteList(); }
+    else alert("Code incorrect !");
 }
 </script>
 
