@@ -1,29 +1,43 @@
-async function confirmVote() {
-    const name = document.getElementById("voteName").value.trim();
-    const message = document.getElementById("voteMessage");
+// /api/votes.js
+const BIN_ID = "69a172acae596e708f4ef256";
+const API_KEY = "$2a$10$N5DlNsKsz3NWeCh56SQGgu.TY56MvBgsMxXLWE5puD1dnRLXdAnbq";
 
-    if(!name) {
-        message.textContent = "Veuillez entrer votre pseudo Minecraft !";
-        return;
-    }
+export default async function handler(req, res) {
+    const url = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`;
 
     try {
-        const res = await fetch('/api/votes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ pseudo: name })
-        });
-
-        const data = await res.json();
-
-        if(res.ok) {
-            message.textContent = "Le vote a été envoyé ! Vous pouvez revoter dans 1 jour !";
-            document.getElementById("voteName").value = "";
-        } else {
-            message.textContent = data.error || "Erreur lors de l'envoi du vote.";
+        if(req.method === "GET") {
+            const r = await fetch(url, { headers: { "X-Master-Key": API_KEY } });
+            const data = await r.json();
+            res.status(200).json({ votes: data.record.votes || [] });
         }
-    } catch (err) {
+        else if(req.method === "POST") {
+            const { pseudo } = req.body;
+            if(!pseudo || pseudo.trim() === "") return res.status(400).json({ error: "Pseudo manquant" });
+
+            const r = await fetch(url, { headers: { "X-Master-Key": API_KEY } });
+            const data = await r.json();
+            const votes = data.record.votes || [];
+
+            votes.push(pseudo.trim());
+
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": API_KEY,
+                    "X-Bin-Versioning": "false"
+                },
+                body: JSON.stringify({ votes })
+            });
+
+            res.status(200).json({ message: "Vote enregistré !" });
+        }
+        else {
+            res.status(405).json({ error: "Méthode non autorisée" });
+        }
+    } catch(err) {
         console.error(err);
-        message.textContent = "Erreur lors de l'envoi du vote.";
+        res.status(500).json({ error: "Erreur serveur" });
     }
 }
